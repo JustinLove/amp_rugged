@@ -32,7 +32,7 @@ module Amp
         # can be used to check if a file has been modified or not. It is a relatively
         # complex binary format and there are two versions of it we also have to
         # support.
-        module Index
+        class Index
           
           class IndexParseError < StandardError; end
           
@@ -43,19 +43,23 @@ module Amp
           #
           # @param [String] file the name of the file to open
           # @param [Support::RootedOpener] opener an opener to scope the opening of files
-          # @return [AbstractIndex] the index subclass this file represents
-          def self.parse(file, opener)
-            opener.open(file, "r") do |fp|
-              if fp.read(4) != "DIRC"
-                raise IndexParseError.new("#{file} is not an index file.")
-              end
-              version = fp.read(4).unpack("N").first
-              case version
-              when 1
-                IndexVersion1.new(fp)
-              when 2
-                IndexVersion2.new(fp)
-              end
+          # @return [Index] the index object this file represents
+          class << self
+            alias_method :parse, :new
+          end
+
+          def initialize(file, opener)
+            path = File.join opener.root, file
+            begin
+              @index = ::Rugged::Index.new(path)
+              @index.refresh
+            rescue
+              raise IndexParseError
+            end
+            @entry_map = {}
+            @index.each do |entry|
+              entry.extend(IndexEntryExtensions)
+              @entry_map[entry.path] = entry
             end
           end
           
@@ -80,88 +84,42 @@ module Amp
           #   padding, N bytes # null padding. At least 1 byte, enough to make the block's size a
           #     multiple of 8 bytes
           #
-          #   This class is a big effing struct for this.
-          class IndexEntry < Struct.new(:ctime, :ctime_ns, :mtime, :mtime_ns, :dev, :inode, :mode, :uid, :gid, :size,
-                                        :hash_id, :assume_valid, :update_needed, :stage, :name)
-            ENTRY_HEADER_FORMAT = "NNNNNNNNNNa20n"
-            ENTRY_HEADER_SIZE   = 62
-            def initialize(*args)
-              if args.size > 0 && args[0].kind_of?(IO)
-                fp = args.first
-                header = fp.read(ENTRY_HEADER_SIZE).unpack(ENTRY_HEADER_FORMAT)
-                self.ctime, self.ctime_ns, self.mtime, self.mtime_ns, self.dev, self.inode, 
-                            self.mode, self.uid, self.gid, self.size, self.hash_id, flags = header
-                self.hash_id = NodeId.from_bin(self.hash_id)
-                self.assume_valid  = flags & 0x8000 > 0
-                self.update_needed = flags & 0x4000 > 0
-                self.stage  = (flags & 0x3000) >> 12
-                namesize = flags & 0x0FFF
-                self.name = fp.read(namesize)
-                mod = (ENTRY_HEADER_SIZE + namesize) & 0x7
-                padding_len = mod == 0 ? 8 : 8 - mod
-                fp.read(padding_len)
-              else
-                super
-              end
+          module IndexEntryExtensions
+            def hash_id
+              NodeId.from_hex(sha)
+            end
+
+            def assume_valid
+              flags & 0x01 == 0x01
+            end
+
+            def update_needed
+              flags & 0x02 == 0x02
+            end
+
+            def stage
+              flags & 0x0c >> 2
             end
           end
           
           ##
-          # Generic Index class, handles common initialization and generic methods
-          # that aren't different between different versions of the index
-          class AbstractIndex
-            def initialize(fp)
-              @entry_map = {}
-              @entry_count = fp.read(4).unpack("N").first
-            end
-            
-            ##
-            # @return [Integer] the number of entries in the Index.
-            def size
-              @entry_count
-            end
-            
-            ##
-            # Returns an IndexEntry for the file with the given name.
-            # Returns nil on failure, and this should not be used by end-users
-            #
-            # @param [String] name the name of the object/file to look up
-            # @return [IndexEntry, NilClass] the entry with the given name, or nil
-            def [](name)
-              @entry_map[name]
-            end
-            
-            def read_entries(fp)
-              @entries = []
-              @entry_count.times do
-                new_entry = IndexEntry.new(fp)
-                @entries << new_entry
-                @entry_map[new_entry.name] = new_entry
-              end
-            end
-            
-            def inspect
-              "<Git Index, entries: #{@entry_count}>"
-            end
+          # @return [Integer] the number of entries in the Index.
+          def size
+            @index.entry_count
           end
           
           ##
-          # Older version of the index. Not used anymore by git.
-          class IndexVersion1 < AbstractIndex
-            def initialize(fp)
-              super
-              @checksum = fp.read(20)
-              read_entries(fp)
-            end
+          # Returns an IndexEntry for the file with the given name.
+          # Returns nil on failure, and this should not be used by end-users
+          #
+          # @param [String] name the name of the object/file to look up
+          # @return [IndexEntry, NilClass] the entry with the given name, or nil
+          def [](name)
+            @entry_map[name]
           end
           
-          ##
-          # Newer version of the index - default format of the index.
-          class IndexVersion2 < AbstractIndex
-            def initialize(fp)
-              super
-              read_entries(fp)
-            end
+          def inspect
+            "<Git Index, entries: #{@entry_count}>"
           end
         end
       end

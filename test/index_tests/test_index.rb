@@ -50,20 +50,20 @@ class TestRuggedIndex < AmpTestCase
   
   def test_info_loads
     rakefile_info = @index["Rakefile"]
-    assert_equal 0x4be39e30, rakefile_info.ctime
-    assert_equal 0, rakefile_info.ctime_ns
-    assert_equal 0x4be39e30, rakefile_info.mtime
-    assert_equal 0, rakefile_info.mtime_ns
+    assert_equal 0x4be39e30, rakefile_info.ctime.to_i
+    #assert_equal 0, rakefile_info.ctime_ns
+    assert_equal 0x4be39e30, rakefile_info.mtime.to_i
+    #assert_equal 0, rakefile_info.mtime_ns
     assert_equal 0x0e000003, rakefile_info.dev
-    assert_equal 0x01d75ecc, rakefile_info.inode
+    assert_equal 0x01d75ecc, rakefile_info.ino
     assert_equal 0x81a4, rakefile_info.mode
     assert_equal 0x01f5, rakefile_info.uid
     assert_equal 0x14, rakefile_info.gid
-    assert_equal 0x05c5, rakefile_info.size
+    assert_equal 0x05c5, rakefile_info.file_size
     assert_equal "53bbb0b38868a1bd2059a1174f54de63764013af", rakefile_info.hash_id.to_hex
     assert_false rakefile_info.assume_valid
     assert_false rakefile_info.update_needed
     assert_equal 0, rakefile_info.stage
-    assert_equal "Rakefile", rakefile_info.name
+    assert_equal "Rakefile", rakefile_info.path
   end
 end
