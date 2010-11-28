@@ -45,4 +45,14 @@ describe Amp::Core::Repositories::Rugged::NodeId do
   it 'stringifies as hex' do
     single.to_s.should == '41'
   end
+
+  context 'with rugged' do
+    it 'from_bin' do
+      Subject.from_bin('01234567890123456789').to_s.size.should == 40
+    end
+
+    it 'from_hex' do
+      Subject.from_hex('0123456789012345678901234567890123456789').to_bin.size.should == 20
+    end
+  end
 end

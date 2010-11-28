@@ -11,5 +11,21 @@
 ##################################################################
 
 module Amp::Core::Repositories::Rugged
-  NodeId = Amp::Core::Support::HexString
+  class NodeId < Amp::Core::Support::HexString
+    def hexlify
+      if @binary.size == 20
+        ::Rugged::raw_to_hex(@binary)
+      else
+        super
+      end
+    end
+
+    def unhexlify
+      if @hex.size == 40
+        ::Rugged::hex_to_raw(@hex)
+      else
+        super
+      end
+    end
+  end
 end

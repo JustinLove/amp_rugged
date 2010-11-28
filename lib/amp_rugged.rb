@@ -4,9 +4,11 @@ require 'zlib'
 require 'stringio'
 
 # Must require the GitPicker or it won't be found.
+require 'rugged'
 require 'amp-front'
 require 'amp-core'
 require 'amp_rugged/repository'
+
 
 module Amp
   module Rugged
