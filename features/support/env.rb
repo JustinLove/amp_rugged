@@ -1,4 +1,4 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../lib')
-require 'amp-git'
+require 'amp_rugged'
 
 require 'spec/expectations'

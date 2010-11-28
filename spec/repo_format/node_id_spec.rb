@@ -12,8 +12,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Amp::Core::Repositories::Git::NodeId do
-  Subject = Amp::Core::Repositories::Git::NodeId
+describe Amp::Core::Repositories::Rugged::NodeId do
+  Subject = Amp::Core::Repositories::Rugged::NodeId
   it 'created from binary' do
     Subject.from_bin('A').should be
   end

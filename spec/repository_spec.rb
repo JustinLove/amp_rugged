@@ -14,14 +14,14 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Amp::Core::Repositories::Git::GitPicker do
+describe Amp::Core::Repositories::Rugged::GitPicker do
   include ::Construct::Helpers
   describe '#repo_in_dir?' do
     it 'returns true if there is a .git directory' do
       within_construct do |c|
         c.directory 'my_repo' do |dir|
           dir.directory '.git' do |final|
-            Amp::Core::Repositories::Git::GitPicker.new.repo_in_dir?(final.to_s).should be_true
+            Amp::Core::Repositories::Rugged::GitPicker.new.repo_in_dir?(final.to_s).should be_true
           end
         end
       end
@@ -32,7 +32,7 @@ describe Amp::Core::Repositories::Git::GitPicker do
         c.directory 'my_repo' do |dir|
           dir.directory '.hg'
           dir.directory '.svn'
-          Amp::Core::Repositories::Git::GitPicker.new.repo_in_dir?(dir.to_s).should be_false
+          Amp::Core::Repositories::Rugged::GitPicker.new.repo_in_dir?(dir.to_s).should be_false
         end
       end
     end
@@ -43,8 +43,8 @@ describe Amp::Core::Repositories::Git::GitPicker do
       within_construct do |c|
         c.directory 'my_repo' do |dir|
           dir.directory '.git'
-          repo = Amp::Core::Repositories::Git::GitPicker.new.pick({}, dir.to_s)
-          repo.should be_a(Amp::Core::Repositories::Git::LocalRepository)
+          repo = Amp::Core::Repositories::Rugged::GitPicker.new.pick({}, dir.to_s)
+          repo.should be_a(Amp::Core::Repositories::Rugged::LocalRepository)
         end
       end
     end
@@ -55,7 +55,7 @@ describe Amp::Core::Repositories::Git::GitPicker do
           dir.directory '.hg'
           dir.directory '.svn'
           lambda {
-            repo = Amp::Core::Repositories::Git::GitPicker.new.pick({}, dir.to_s)
+            repo = Amp::Core::Repositories::Rugged::GitPicker.new.pick({}, dir.to_s)
           }.should raise_error(ArgumentError)
         end
       end
@@ -67,7 +67,7 @@ describe Amp::Core::Repositories::Git::GitPicker do
       c.directory 'my_repo' do |dir|
         dir.directory '.git'
         repo = Amp::Core::Repositories.pick({}, dir.to_s)
-        repo.should be_a(Amp::Core::Repositories::Git::LocalRepository)
+        repo.should be_a(Amp::Core::Repositories::Rugged::LocalRepository)
       end
     end
   end

@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-DEPENDENCIES = %w(amp-front amp-core amp-git)
+DEPENDENCIES = %w(amp_rugged)
 DEPENDENCIES.each do |x|
   require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', x, 'lib', x))
 end
@@ -27,7 +27,7 @@ class AmpTestCase < MiniTest::Unit::TestCase
     FileUtils.rm_rf @tempdir if defined?(@tempdir) && @tempdir && File.exist?(@tempdir)
   end
 
-  NodeId = Amp::Core::Repositories::Git::NodeId unless const_defined?(:NodeId)
+  NodeId = Amp::Core::Repositories::Rugged::NodeId unless const_defined?(:NodeId)
 
   # taken from rubygems
   def write_file(path)

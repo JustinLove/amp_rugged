@@ -14,7 +14,7 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
-class TestGitTagObject < AmpTestCase
+class TestRuggedTagObject < AmpTestCase
   
   def setup
     @content = <<-EOF
@@ -32,7 +32,7 @@ nLE/L9aUXdWeTFPron96DLA=
 =2E+0
 -----END PGP SIGNATURE-----
 EOF
-    @tag_obj = Amp::Core::Repositories::Git::TagObject.new(
+    @tag_obj = Amp::Core::Repositories::Rugged::TagObject.new(
                    NodeId.sha1(@content), nil, @content)
   end
   

@@ -13,7 +13,7 @@
 ##################################################################
 
 module Amp
-  module Git
+  module Rugged
     
     ##
     # This class allows you to access a file at a given revision in the repo's

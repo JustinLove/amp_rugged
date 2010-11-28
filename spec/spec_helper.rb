@@ -19,7 +19,7 @@ DEPENDENCIES.each do |x|
   require File.join(File.dirname(__FILE__), '..', '..', x, 'lib', x)
 end
 require 'rubygems'
-require 'amp-git'
+require 'amp_rugged'
 require 'spec'
 require 'spec/autorun'
 require 'construct'

@@ -1,4 +1,4 @@
-= amp-git
+= amp_rugged
 
 Description goes here.
 

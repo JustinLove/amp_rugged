@@ -15,7 +15,7 @@
 module Amp
   module Core
     module Repositories    
-      module Git
+      module Rugged
         
         class LocalRepository < Amp::Core::Repositories::AbstractLocalRepository
           
@@ -35,7 +35,7 @@ module Amp
             @git_opener  = Support::RootedOpener.new @root # this will open relative to root/.git
             @git_opener.default  = :open_git     # just with different defaults
             
-            @staging_area = Amp::Core::Repositories::Git::StagingArea.new self
+            @staging_area = Amp::Core::Repositories::Rugged::StagingArea.new self
             
             if create
               init
@@ -82,15 +82,15 @@ module Amp
           def [](rev)
             case rev
             when String
-              Amp::Git::Changeset.new self, rev
+              Amp::Rugged::Changeset.new self, rev
             when nil
-              Amp::Git::WorkingDirectoryChangeset.new self
+              Amp::Rugged::WorkingDirectoryChangeset.new self
             when 'tip', :tip
-              Amp::Git::Changeset.new self, parents[0]
+              Amp::Rugged::Changeset.new self, parents[0]
             when Integer
               revs = `git log --pretty=oneline 2> /dev/null`.split("\n")
               short_name = revs[revs.size - 1 - rev].split(' ').first
-              Amp::Git::Changeset.new self, short_name
+              Amp::Rugged::Changeset.new self, short_name
             end
           end
           

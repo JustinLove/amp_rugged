@@ -14,7 +14,7 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
-class TestGitCommitObject < AmpTestCase
+class TestRuggedCommitObject < AmpTestCase
   
   def setup
     @content = "tree ecb7b4460825bed7c0bc6d17004816d15ae32c5e\n"+
@@ -22,8 +22,8 @@ class TestGitCommitObject < AmpTestCase
                "Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\ncommitter "+
                "Michael Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\n\n"+
                "Removed the gemspec from the repo\n"
-    @commit_obj = Amp::Core::Repositories::Git::CommitObject.new(
-                      Amp::Core::Repositories::Git::NodeId.sha1(@content), nil, @content)
+    @commit_obj = Amp::Core::Repositories::Rugged::CommitObject.new(
+                      Amp::Core::Repositories::Rugged::NodeId.sha1(@content), nil, @content)
   end
   
   def test_correct_type

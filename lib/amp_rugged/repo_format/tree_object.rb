@@ -21,7 +21,7 @@
 module Amp
   module Core
     module Repositories
-      module Git
+      module Rugged
         ##
         # = TreeObject
         #

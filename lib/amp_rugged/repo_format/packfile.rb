@@ -23,7 +23,7 @@
 module Amp
   module Core
     module Repositories    
-      module Git
+      module Rugged
         ##
         # = PackFile
         #
@@ -76,7 +76,7 @@ module Amp
                   
                 elsif result.type == OBJ_OFS_DELTA
                   cur = fp.tell
-                  patch = Amp::Core::Repositories::Git::Encoding::BinaryDelta.new(result.content)
+                  patch = Amp::Core::Repositories::Rugged::Encoding::BinaryDelta.new(result.content)
                   previous = self.at(fp, result.delta_offset)
                   result.content = patch.apply(previous.content)
                   result.size = result.content.size

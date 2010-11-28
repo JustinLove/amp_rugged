@@ -10,6 +10,6 @@
 #                                                                #
 ##################################################################
 
-module Amp::Core::Repositories::Git
+module Amp::Core::Repositories::Rugged
   NodeId = Amp::Core::Support::HexString
 end

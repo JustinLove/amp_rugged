@@ -13,13 +13,13 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
-class TestGitTreeObject < AmpTestCase
+class TestRuggedTreeObject < AmpTestCase
   
   def setup
     @content = "100644 example_helper.rb\x00\xD3\xD5\xED\x9DA4_"+
                "\xE3\xC3\nK\xCD<!\xEA-_\x9E\xDC=40000 examples\x00"+
                "\xAE\xCB\xE9d!|\xB9\xA6\x96\x024],U\xEE\x99\xA2\xEE\xD4\x92"
-    @tree_obj = Amp::Core::Repositories::Git::TreeObject.new(
+    @tree_obj = Amp::Core::Repositories::Rugged::TreeObject.new(
                     NodeId.sha1(@content), nil,@content)
   end
   

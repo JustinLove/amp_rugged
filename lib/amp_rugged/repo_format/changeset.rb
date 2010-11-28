@@ -15,7 +15,7 @@
 require 'time'
 
 module Amp
-  module Git
+  module Rugged
     
     ##
     # A Changeset is a simple way of accessing the repository within a certain

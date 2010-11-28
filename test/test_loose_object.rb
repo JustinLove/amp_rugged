@@ -14,7 +14,7 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
-class TestGitLooseObject < AmpTestCase
+class TestRuggedLooseObject < AmpTestCase
   def setup
     super
     self.write_file "objects/ab/looseobject1" do |io|
@@ -31,19 +31,19 @@ class TestGitLooseObject < AmpTestCase
   end
   
   def test_simple_file
-    obj = Amp::Core::Repositories::Git::LooseObject.lookup("ablooseobject1", @opener)
+    obj = Amp::Core::Repositories::Rugged::LooseObject.lookup("ablooseobject1", @opener)
     assert_equal "blob", obj.type
     assert_equal "abcdefghij", obj.content
   end
   
   def test_trailing_garbage_file
-    obj = Amp::Core::Repositories::Git::LooseObject.lookup("ablooseobject2", @opener)
+    obj = Amp::Core::Repositories::Rugged::LooseObject.lookup("ablooseobject2", @opener)
     assert_equal "blob", obj.type
     assert_equal "mike", obj.content
   end
   
   def test_empty_file
-    obj = Amp::Core::Repositories::Git::LooseObject.lookup("ablooseobject3", @opener)
+    obj = Amp::Core::Repositories::Rugged::LooseObject.lookup("ablooseobject3", @opener)
     assert_equal "blob", obj.type
     assert_equal "", obj.content
   end

@@ -15,7 +15,7 @@
 module Amp
   module Core
     module Repositories    
-      module Git
+      module Rugged
         
         class GitPicker < Amp::Core::Repositories::GenericRepoPicker
           

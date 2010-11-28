@@ -21,20 +21,18 @@
 module Amp
   module Core
     module Repositories
-      module Git
+      module Rugged
         ##
-        # = TagObject
+        # = CommitObject
         #
-        # This is a formal tag object in the commit system. Most tags actually don't
-        # involve one of these objects - they just create a ref (alias) to a commit
-        # object. This tag will also reference a (usually) commit object, but they
-        # can contain their own messages, including PGP signatures. And honestly,
-        # we just have to suck it up and support them.
-        class TagObject < RawObject
-          attr_reader :object_ref, :reffed_type, :tag, :tagger, :date, :message
+        # This is a commit object in the git system. This contains a reference to
+        # a tree, one or more parents, an author, a committer, and a message. This
+        # object is all you need to know everything about a commit.
+        class CommitObject < RawObject
+          attr_reader :tree_ref, :parent_refs, :author, :committer, :date, :message
           
           ##
-          # Initializes the TagObject. Needs a hash to identify it and
+          # Initializes the CommitObject. Needs a hash to identify it and
           # an opener. The opener should point to the .git directory. Immediately
           # parses the object.
           #
@@ -46,11 +44,12 @@ module Amp
           def initialize(hsh, opener, content = nil)
             if content
               @hash_id, @opener = hsh, opener
-              @type = 'tag'
+              @type = 'commit'
               @content = content
             else
               super(hsh, opener)
             end
+            @parent_refs = []
             parse!
           end
 
@@ -63,14 +62,15 @@ module Amp
             last_idx = 0
             lines.each_with_index do |line, idx|
               case line
-              when /^object (.{40})/
-                @object_ref = NodeId.from_hex($1)
-              when /^type (\S+)/
-                @reffed_type = $1
-              when /^tag\s+(.*)\s*$/
-                @tag = $1
-              when /^tagger #{AUTHOR_MATCH}/
-                @tagger = "#{$1} <#{$2}>"
+              when /^tree (.{40})/
+                @tree_ref = NodeId.from_hex($1)
+              when /^parent (.{40})/
+                @parent_refs << NodeId.from_hex($1)
+              when /^author #{AUTHOR_MATCH}/
+                @author = "#{$1} <#{$2}>"
+                @date = Time.at($3.to_i)
+              when /^committer #{AUTHOR_MATCH}/
+                @committer = "#{$1} <#{$2}>"
                 @date = Time.at($3.to_i)
               when ""
                 last_idx = idx + 1

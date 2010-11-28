@@ -14,10 +14,10 @@
 ##################################################################
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
-require 'amp-git/encoding/binary_delta'
+require 'amp_rugged/encoding/binary_delta'
 
 class TestPackfileWithIndex < AmpTestCase
-  include Amp::Core::Repositories::Git::Encoding
+  include Amp::Core::Repositories::Rugged::Encoding
   
   def test_parse_numbers
     delta_str = "\x10\x20"

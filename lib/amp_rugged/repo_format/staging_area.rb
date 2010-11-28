@@ -15,7 +15,7 @@
 module Amp
   module Core
     module Repositories
-      module Git
+      module Rugged
         class StagingArea < Amp::Core::Repositories::AbstractStagingArea
           
           attr_accessor :repo
@@ -206,7 +206,7 @@ module Amp
           # @return [Array<String>] all files tracked by the repository at this moment in
           #   time, including just-added files (for example) that haven't been committed yet.
           def all_files
-            Amp::Git::WorkingDirectoryChangeset.new(@repo).all_files
+            Amp::Rugged::WorkingDirectoryChangeset.new(@repo).all_files
           end
         end
       end

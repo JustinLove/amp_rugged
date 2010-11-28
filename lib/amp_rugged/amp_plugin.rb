@@ -5,12 +5,12 @@ module Amp
   end
 end
 
-class Amp::Plugins::Git < Amp::Plugins::Base
+class Amp::Plugins::Rugged < Amp::Plugins::Base
   def initialize(opts={})
     @opts = opts
   end
   
   def load!
-    require 'amp-git'
+    require 'amp_rugged'
   end
 end
