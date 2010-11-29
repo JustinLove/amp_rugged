@@ -36,16 +36,15 @@ module Amp
             
             
             def for_hash(hsh, git_opener)
-              # no way to handle packed objects yet
-              LooseObject.lookup(hsh, git_opener)
+              repo = ::Rugged::Repository.new(git_opener.root)
+              repo.lookup(hsh)
             end
             
             def construct(hsh, opener, type, content)
               # type, content should both be set now
               type_lookup = {'tree' => TreeObject, 'commit' => CommitObject, 'tag' => TagObject}
-              object_klass = type_lookup[type] || LooseObject
+              object_klass = type_lookup[type]
               result = object_klass.new(hsh, opener, content)
-              result.type = type if object_klass == LooseObject
               result
             end
           end
