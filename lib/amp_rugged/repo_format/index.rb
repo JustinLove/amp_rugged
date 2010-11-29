@@ -98,7 +98,7 @@ module Amp
             end
 
             def stage
-              flags & 0x0c >> 2
+              (flags & 0x0c) >> 2
             end
           end
           
