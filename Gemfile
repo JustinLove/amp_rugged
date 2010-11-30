@@ -4,7 +4,7 @@ source "http://gems.github.com"
 
 gem 'amp-front', '>= 0.1.0'
 gem 'amp-core', '>= 0.1.0'
-gem 'rugged', '0.0.1'
+gem 'rugged', '0.1.2'
 
 group :development do
   gem 'rspec', '< 2.0.0'
