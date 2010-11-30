@@ -28,7 +28,6 @@ module Amp
         autoload :LooseObject,             'amp_rugged/repo_format/loose_object.rb'
         autoload :TreeObject,              'amp_rugged/repo_format/tree_object.rb'
         autoload :CommitObject,            'amp_rugged/repo_format/commit_object.rb'
-        autoload :TagObject,               'amp_rugged/repo_format/tag_object.rb'
         autoload :Index,                   'amp_rugged/repo_format/index.rb'
         module Encoding                             
           autoload :BinaryDelta,           'amp_rugged/encoding/binary_delta.rb'
