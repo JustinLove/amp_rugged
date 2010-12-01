@@ -26,7 +26,6 @@ module Amp
         autoload :StagingArea,             'amp_rugged/repo_format/staging_area.rb'
         autoload :RawObject,               'amp_rugged/repo_format/raw_object.rb'
         autoload :LooseObject,             'amp_rugged/repo_format/loose_object.rb'
-        autoload :TreeObject,              'amp_rugged/repo_format/tree_object.rb'
         autoload :CommitObject,            'amp_rugged/repo_format/commit_object.rb'
         autoload :Index,                   'amp_rugged/repo_format/index.rb'
         module Encoding                             

@@ -16,11 +16,15 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 class TestRuggedTreeObject < AmpTestCase
   
   def setup
+    super
+
     @content = "100644 example_helper.rb\x00\xD3\xD5\xED\x9DA4_"+
                "\xE3\xC3\nK\xCD<!\xEA-_\x9E\xDC=40000 examples\x00"+
                "\xAE\xCB\xE9d!|\xB9\xA6\x96\x024],U\xEE\x99\xA2\xEE\xD4\x92"
-    @tree_obj = Amp::Core::Repositories::Rugged::TreeObject.new(
-                    NodeId.sha1(@content), nil,@content)
+    `git init --bare #{tempdir}`
+    repo = Rugged::Repository.new(tempdir)
+    sha = repo.write(@content, 'tree')
+    @tree_obj = Rugged::Tree.new(repo, sha)
   end
   
   def test_correct_type
@@ -28,27 +32,27 @@ class TestRuggedTreeObject < AmpTestCase
   end
   
   def test_correct_content
-    assert_equal @content, @tree_obj.content
+    assert_equal @content, @tree_obj.read_raw.first
   end
   
   def test_correct_num_pairs
-    assert_equal 2, @tree_obj.size
+    assert_equal 2, @tree_obj.entry_count
   end
   
   def test_parses_filenames
-    assert_not_nil @tree_obj.tree_lookup("example_helper.rb")
-    assert_not_nil @tree_obj.tree_lookup("examples")
+    assert_not_nil @tree_obj.get_entry("example_helper.rb")
+    assert_not_nil @tree_obj.get_entry("examples")
   end
   
   def test_parses_mode_correct
-    assert_equal 0100644, @tree_obj.tree_lookup("example_helper.rb").mode
-    assert_equal  040000, @tree_obj.tree_lookup("examples").mode
+    assert_equal 0100644, @tree_obj.get_entry("example_helper.rb").attributes
+    assert_equal  040000, @tree_obj.get_entry("examples").attributes
   end
   
   def test_parses_refs
     expected_first = NodeId.from_bin("\xD3\xD5\xED\x9DA4_\xE3\xC3\nK\xCD<!\xEA-_\x9E\xDC=")
     expected_second = NodeId.from_bin("\xAE\xCB\xE9d!|\xB9\xA6\x96\x024],U\xEE\x99\xA2\xEE\xD4\x92")
-    assert_equal expected_first, @tree_obj.tree_lookup("example_helper.rb").ref
-    assert_equal expected_second, @tree_obj.tree_lookup("examples").ref
+    assert_equal expected_first, @tree_obj.get_entry("example_helper.rb").sha
+    assert_equal expected_second, @tree_obj.get_entry("examples").sha
   end
 end
