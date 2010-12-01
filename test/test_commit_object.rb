@@ -14,16 +14,35 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
+class Rugged::Commit
+  def inspect
+    "commit #{sha}"
+  end
+end
+
 class TestRuggedCommitObject < AmpTestCase
   
   def setup
-    @content = "tree ecb7b4460825bed7c0bc6d17004816d15ae32c5e\n"+
-               "parent 8c27219d73786aa2e91d5ae964624ef36696c307\nauthor Michael "+
+    super
+
+    `git init --bare #{tempdir}`
+    repo = Rugged::Repository.new(tempdir)
+    @tree = repo.write('', 'tree')
+    repo.lookup(@tree)
+    @content_parent = "tree #{@tree}\n"+
+               "author Michael "+
                "Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\ncommitter "+
                "Michael Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\n\n"+
                "Removed the gemspec from the repo\n"
-    @commit_obj = Amp::Core::Repositories::Rugged::CommitObject.new(
-                      Amp::Core::Repositories::Rugged::NodeId.sha1(@content), nil, @content)
+    @parent = repo.write(@content_parent, 'commit')
+    repo.lookup(@parent)
+    @content = "tree #{@tree}\n"+
+               "parent #{@parent}\nauthor Michael "+
+               "Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\ncommitter "+
+               "Michael Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\n\n"+
+               "Removed the gemspec from the repo\n"
+    sha = repo.write(@content, 'commit')
+    @commit_obj = repo.lookup(sha)
   end
   
   def test_correct_type
@@ -31,30 +50,30 @@ class TestRuggedCommitObject < AmpTestCase
   end
   
   def test_correct_content
-    assert_equal @content, @commit_obj.content
+    assert_equal @content, @commit_obj.read_raw.first
   end
   
   def test_tree_ref
-    assert_equal NodeId.from_hex("ecb7b4460825bed7c0bc6d17004816d15ae32c5e"), @commit_obj.tree_ref
+    assert_equal @tree, @commit_obj.tree.sha
   end
   
   def test_parent_refs
-    assert_equal [NodeId.from_hex("8c27219d73786aa2e91d5ae964624ef36696c307")], @commit_obj.parent_refs
+    assert_equal @parent, @commit_obj.parents.first.sha
   end
   
   def test_author
-    assert_equal "Michael Edgar <michael.j.edgar@dartmouth.edu>", @commit_obj.author
+    assert_equal "Michael Edgar", @commit_obj.author.name
   end
   
   def test_committer
-    assert_equal "Michael Edgar <michael.j.edgar@dartmouth.edu>", @commit_obj.author
+    assert_equal "Michael Edgar", @commit_obj.author.name
   end
   
   def test_date
-    assert_equal Time.at(1273865360), @commit_obj.date
+    assert_equal Time.at(1273865360), @commit_obj.author.time
   end
   
   def test_messages
-    assert_equal "Removed the gemspec from the repo", @commit_obj.message
+    assert_equal "Removed the gemspec from the repo\n", @commit_obj.message
   end
 end
