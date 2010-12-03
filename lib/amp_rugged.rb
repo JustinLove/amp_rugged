@@ -27,9 +27,6 @@ module Amp
         autoload :RawObject,               'amp_rugged/repo_format/raw_object.rb'
         autoload :LooseObject,             'amp_rugged/repo_format/loose_object.rb'
         autoload :Index,                   'amp_rugged/repo_format/index.rb'
-        module Encoding                             
-          autoload :BinaryDelta,           'amp_rugged/encoding/binary_delta.rb'
-        end
       end
     end
   end
