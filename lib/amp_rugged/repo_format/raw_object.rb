@@ -23,7 +23,7 @@ module Amp
     module Repositories    
       module Rugged
         ##
-        # = LooseObject
+        # = RawObject
         #
         # A single loose object (tree, tag, commit, etc.) in the Git system.
         # Its type and content will be determined after we read the file.

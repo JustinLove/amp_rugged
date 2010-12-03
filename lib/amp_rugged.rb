@@ -25,7 +25,6 @@ module Amp
         autoload :NodeId,                  'amp_rugged/repo_format/node_id.rb'
         autoload :StagingArea,             'amp_rugged/repo_format/staging_area.rb'
         autoload :RawObject,               'amp_rugged/repo_format/raw_object.rb'
-        autoload :LooseObject,             'amp_rugged/repo_format/loose_object.rb'
         autoload :Index,                   'amp_rugged/repo_format/index.rb'
       end
     end
