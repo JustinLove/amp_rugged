@@ -23,7 +23,7 @@ class TestRuggedTreeObject < AmpTestCase
                "\xAE\xCB\xE9d!|\xB9\xA6\x96\x024],U\xEE\x99\xA2\xEE\xD4\x92"
     `git init --bare #{tempdir}`
     repo = Rugged::Repository.new(tempdir)
-    sha = repo.write(@content, 'tree')
+    sha = repo.write(Rugged::RawObject.new('tree', @content))
     @tree_obj = Rugged::Tree.new(repo, sha)
   end
   
@@ -32,7 +32,7 @@ class TestRuggedTreeObject < AmpTestCase
   end
   
   def test_correct_content
-    assert_equal @content, @tree_obj.read_raw.first
+    assert_equal @content, @tree_obj.read_raw.data
   end
   
   def test_correct_num_pairs

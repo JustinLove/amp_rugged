@@ -27,21 +27,21 @@ class TestRuggedCommitObject < AmpTestCase
 
     `git init --bare #{tempdir}`
     repo = Rugged::Repository.new(tempdir)
-    @tree = repo.write('', 'tree')
+    @tree = repo.write(Rugged::RawObject.new('tree', ''))
     repo.lookup(@tree)
     @content_parent = "tree #{@tree}\n"+
                "author Michael "+
                "Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\ncommitter "+
                "Michael Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\n\n"+
                "Removed the gemspec from the repo\n"
-    @parent = repo.write(@content_parent, 'commit')
+    @parent = repo.write(Rugged::RawObject.new('commit', @content_parent))
     repo.lookup(@parent)
     @content = "tree #{@tree}\n"+
                "parent #{@parent}\nauthor Michael "+
                "Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\ncommitter "+
                "Michael Edgar <michael.j.edgar@dartmouth.edu> 1273865360 -0400\n\n"+
                "Removed the gemspec from the repo\n"
-    sha = repo.write(@content, 'commit')
+    sha = repo.write(Rugged::RawObject.new('commit', @content))
     @commit_obj = repo.lookup(sha)
   end
   
@@ -50,7 +50,7 @@ class TestRuggedCommitObject < AmpTestCase
   end
   
   def test_correct_content
-    assert_equal @content, @commit_obj.read_raw.first
+    assert_equal @content, @commit_obj.read_raw.data
   end
   
   def test_tree_ref
