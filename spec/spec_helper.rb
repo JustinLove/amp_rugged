@@ -20,10 +20,10 @@ DEPENDENCIES.each do |x|
 end
 require 'rubygems'
 require 'amp_rugged'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 require 'construct'
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   
 end
