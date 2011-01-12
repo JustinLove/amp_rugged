@@ -208,7 +208,7 @@ module Amp
       def initialize(repo, opts={:text => ''})
         @repo = repo
         @text = opts[:text]
-        @date = Time.parse opts[:date].to_s
+        @date = opts[:date] ? Time.parser(opts[:date].to_s) : Time.now
         @user = opts[:user]
         @parents = opts[:parents].map {|p| Changeset.new(@repo, p) } if opts[:parents]
         @status  = opts[:changes]
@@ -300,7 +300,7 @@ module Amp
       # @return [Array<String>] an array of filenames in the tree that match +match+
       def walk(match, check_ignored = false)
         tree = @repo.staging_area.walk true, check_ignored, match
-        tree.keys.sort
+        tree.keys.compact.sort
       end
       
       # What files have been altered in this changeset?

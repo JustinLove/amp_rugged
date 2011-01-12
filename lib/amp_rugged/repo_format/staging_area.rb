@@ -131,9 +131,9 @@ module Amp
           # I DARE YOU!
           def file_status(filename)
             parse!
-            inverted = @status.inject({}) do |h, (k, v)|
-              v.each {|v_| h[v_] = k }
-              h
+            inverted = {}
+            @status.each do |k, v|
+              v.each {|v_| inverted[v_] = k }
             end
             
             # lame hack, i know
@@ -182,16 +182,16 @@ module Amp
             
             @status = {}
             data    = `git status 2> /dev/null`.split("\n")
-            data.inject @status do |h, line|
+            data.each do |line|
               case line
               when /^#\s+(\w+):\s(.+)$/
-                h[$1.to_sym] = $2.strip
+                @status[$1.to_sym] = [$2.strip]
               when /^#\s+new file:\s(.+)$/
-                h[:added] = $1.strip
+                @status[:added] = [$1.strip]
               when /^#\s+([^ ]+)$/
-                h[:untracked] = $1.strip
+                @status[:untracked] = [$1.strip]
               else
-                h
+                @status
               end
             end
             
