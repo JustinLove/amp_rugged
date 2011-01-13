@@ -20,6 +20,7 @@ DEPENDENCIES.each do |x|
 end
 require 'rubygems'
 require 'amp_rugged'
+require 'bundler/setup'
 require 'rspec'
 require 'rspec/autorun'
 require 'construct'

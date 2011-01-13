@@ -1,4 +1,3 @@
-# This is an install-only file - it's not used by the application
 source "http://rubygems.org"
 source "http://gems.github.com"
 
@@ -12,4 +11,5 @@ group :development do
   gem 'cucumber'
   gem 'devver-construct', :require => 'construct'
   gem 'minitest'
+  gem 'amp_repo_spec' #, :path => '../amp_repo_spec'
 end
