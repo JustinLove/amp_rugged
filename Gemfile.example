@@ -6,7 +6,7 @@ gem 'amp-core', '>= 0.1.0'
 gem 'rugged', '0.1.2'
 
 group :development do
-  gem 'rspec', '>= 2.0.0'
+  gem 'rspec', '~> 2.2.0'
   gem 'yard'
   gem 'cucumber'
   gem 'devver-construct', :require => 'construct'
