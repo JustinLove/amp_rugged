@@ -23,6 +23,13 @@ module Amp
     # 3adf21, then we can look those up, and work within the repository at the
     # moment of that revision.
     class Changeset < Amp::Core::Repositories::AbstractChangeset
+
+      module GitShell
+        def git(command)
+          %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command}}
+        end
+      end
+      include GitShell
       
       attr_accessor :repo
       attr_reader   :revision
@@ -143,13 +150,13 @@ module Amp
       ##
       # Converts a semi-reliable revision # into a git changeset node.
       def convert_rev_to_node(rev)
-        %x(git rev-list --reverse HEAD).split("\n")[rev - 1]
+        git("rev-list --reverse HEAD").split("\n")[rev - 1]
       end
       
       ##
       # Converts a git changeset node into a semi-reliable revision #
       def convert_node_to_rev(node)
-        %x(git rev-list --reverse HEAD | grep -n #{node} | cut -d: -f1).to_i
+        git("rev-list --reverse HEAD | grep -n #{node} | cut -d: -f1").to_i
       end
         
       
@@ -159,7 +166,7 @@ module Amp
         return if @parsed
         
         # the parents
-        log_data = `git log -1 #{node}^ 2> /dev/null`
+        log_data = git("log -1 #{node}^")
         
         # DETERMINING PARENTS
         dad   = log_data[/^commit (.+)$/, 1]
@@ -174,23 +181,32 @@ module Amp
         @parents = [dad, mom].compact.map {|r| Changeset.new repo, r }
         
         # the actual changeset
-        log_data = `git log -1 #{node}  2> /dev/null`
+        log_data = git("log -1 #{node}")
         
         # DETERMINING DATE
-        @date = Time.parse log_data[/^Date:\s+(.+)$/, 1]
+        if log_data.match(/Date/)
+          @date = Time.parse log_data[/^Date:\s+(.+)$/, 1]
+        else
+          @date = Time.now
+        end
         
         # DETERMINING USER
         @user = log_data[/^Author:\s+(.+)$/, 1]
         
         # DETERMINING DESCRIPTION
-        @description = log_data.split("\n")[4..-1].map {|l| l.strip }.join "\n"
+        lines = log_data.split("\n")[4..1]
+        if (lines)
+          @description = lines.map {|l| l.strip }.join "\n"
+        else
+          @description = ''
+        end
         
         # ALTERED FILES
-        @altered_files = `git log -1 #{node} --pretty=oneline --name-only  2> /dev/null`.split("\n")[1..-1]
+        @altered_files = git("log -1 --pretty=oneline --name-only #{node}").split("\n")[1..-1]
         
         # ALL FILES
         # @all_files is also sorted. Hooray!
-        @all_files = `git ls-tree -r #{node}`.split("\n").map do |line|
+        @all_files = git("ls-tree -r #{node}").split("\n").map do |line|
           # 100644 blob cdbeb2a42b714a4db49293c87fec4e180d07d44f    .autotest
           line[/^\d+ \w+ \w+\s+(.+)$/, 1]
         end
@@ -201,6 +217,8 @@ module Amp
     end
     
     class WorkingDirectoryChangeset < Amp::Core::Repositories::AbstractChangeset
+
+      include Changeset::GitShell
       
       attr_accessor :repo
       alias_method :repository, :repo
@@ -254,7 +272,7 @@ module Amp
       # 
       # @return [String] the user who made the changeset
       def branch
-        @branch ||= `git branch  2> /dev/null`[/\*\s(.+)$/, 1]
+        @branch ||= git("branch")[/\*\s(.+)$/, 1]
       end
 
       ##
@@ -281,7 +299,7 @@ module Amp
       #
       # @return [Array<String>] the files tracked at the given revision
       def all_files
-        @all_files ||= `git ls-files  2> /dev/null`.split("\n")
+        @all_files ||= git("ls-files").split("\n")
       end
       
       # Is this changeset a working changeset?
@@ -304,7 +322,7 @@ module Amp
       end
       
       # What files have been altered in this changeset?
-      def altered_files; `git show --name-only #{node} 2> /dev/null`.split("\n"); end
+      def altered_files; git("show --name-only #{node}").split("\n"); end
       # What files have changed?
       def modified; status[:modified]; end
       # What files have we added?
@@ -323,7 +341,7 @@ module Amp
       def parse!
         return if @parsed
         
-        log_data = `git log -1 HEAD  2> /dev/null`
+        log_data = git("log -1 HEAD")
         
         unless log_data.empty?
           # DETERMINING PARENTS
