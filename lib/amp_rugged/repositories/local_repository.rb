@@ -18,6 +18,9 @@ module Amp
       module Rugged
         
         class LocalRepository < Amp::Core::Repositories::AbstractLocalRepository
+          def git(command)
+            %x{git --git-dir=#{root}/.git --work-tree=#{root} #{command}}
+          end
           
           attr_accessor :root
           attr_accessor :config
@@ -45,7 +48,7 @@ module Amp
           def init(config=@config)
             super(config)
             
-            `cd #{@root} && git init 2> /dev/null`
+            git('init')
             true
           end
           
@@ -63,12 +66,12 @@ module Amp
           
           def commit(opts={})
             add_all_files
-            string = "git commit #{opts[:user] ? "--author #{opts[:user].inspect}" : "" }" +
+            string = "commit #{opts[:user] ? "--author #{opts[:user].inspect}" : "" }" +
                      " #{opts[:empty_ok] ? "--allow-empty" : "" }" +
-                     " #{opts[:message] ? "-m #{opts[:message].inspect}" : "" } 2> /dev/null"
+                     " #{opts[:message] ? "-m #{opts[:message].inspect}" : "" }"
             string.strip!
             
-            system string
+            git string
           end
           
           def add_all_files
@@ -88,14 +91,14 @@ module Amp
             when 'tip', :tip
               Amp::Rugged::Changeset.new self, parents[0]
             when Integer
-              revs = `git log --pretty=oneline 2> /dev/null`.split("\n")
+              revs = git('log --pretty=oneline').split("\n")
               short_name = revs[revs.size - 1 - rev].split(' ').first
               Amp::Rugged::Changeset.new self, short_name
             end
           end
           
           def size
-            `git log --pretty=oneline 2> /dev/null`.split("\n").size
+            git('log --pretty=oneline').split("\n").size
           end
           
           ##
@@ -157,22 +160,24 @@ module Amp
           def parse_status!(opts={})
             return if @parsed
             
-            data    = `git status #{opts[:node1]}..#{opts[:node2]}  2> /dev/null`.split("\n")
-            @status = data.inject({}) do |h, line| # yeah i know stfu
+            data    = git('status #{opts[:node1]}..#{opts[:node2]}').split("\n")
+            @status = {}
+            data.each do |line| # yeah i know stfu
+              p line
               case line
               when /^#\s+(\w+):\s(.+)$/
-                h[$1.to_sym] = $2; h
+                @status[$1.to_sym] = [$2]
               when /^#\s+([^ ]+)$/
-                h[:unknown] = $1; h
+                @status[:unknown] = [$1]
               else
-                h
+                @status
               end
             end
             @parsed = true
           end
           
           def parents
-            first = `git log -1 HEAD 2> /dev/null`
+            first = git('log -1 HEAD')
             dad   = first[/^commit (.+)$/, 1]
             dad   = dad ? dad[0..6] : nil
             mom   = nil
