@@ -17,6 +17,9 @@ module Amp
     module Repositories
       module Rugged
         class StagingArea < Amp::Core::Repositories::AbstractStagingArea
+          def git(command)
+            %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command}}
+          end
           
           attr_accessor :repo
           
@@ -30,7 +33,7 @@ module Amp
           # @param [[String]] filenames a list of files to add in the next commit
           # @return [Boolean] true for success, false for failure
           def add(*filenames)
-            `git add #{filenames.join ' '} 2> /dev/null`
+            git("add #{filenames.join ' '}")
             true
           end
 
@@ -40,7 +43,7 @@ module Amp
           # @api
           # @return [String] relative to root
           def vcs_dir
-            '.hg'
+            '.git'
           end
 
           ##
@@ -51,7 +54,7 @@ module Amp
           # @param [String, Array<String>] filenames a list of files to remove in the next commit
           # @return [Boolean] true for success, false for failure
           def remove(*filenames)
-            `git rm #{filenames.join ' '} 2> /dev/null`
+            git("rm #{filenames.join ' '}")
             true
           end
 
@@ -72,7 +75,7 @@ module Amp
           # @param  [Array<String>] files the name of the files to mark as untracked
           # @return [Boolean] success marker
           def forget(*files)
-            `git rm --cached #{files.join ' '} 2> /dev/null`
+            git("rm --cached #{files.join ' '}")
             true
           end
 
@@ -84,7 +87,7 @@ module Amp
           # @param [String] to the destination of the file copy
           # @return [Boolean] true for success, false for failure
           def copy(from, to)
-            `git cp #{from} #{to} 2> /dev/null`
+            git("cp #{from} #{to}")
             true
           end
 
@@ -96,7 +99,7 @@ module Amp
           # @param [String] to the destination of the file move
           # @return [Boolean] true for success, false for failure
           def move(from, to)
-            `git mv #{from} #{to} 2> /dev/null`
+            git("mv #{from} #{to}")
             true
           end
 
@@ -119,7 +122,7 @@ module Amp
           # @param [[String]] filenames a list of files to remove from the staging area for committing
           # @return [Boolean] true for success, false for failure
           def exclude(*filenames)
-            `git rm --cached #{filenames.join ' '} 2> /dev/null`
+            git("rm --cached #{filenames.join ' '}")
             true
           end
           alias_method :unstage, :exclude
@@ -181,7 +184,7 @@ module Amp
             return if @parsed
             
             @status = {}
-            data    = `git status 2> /dev/null`.split("\n")
+            data    = git("status").split("\n")
             data.each do |line|
               case line
               when /^#\s+(\w+):\s(.+)$/
