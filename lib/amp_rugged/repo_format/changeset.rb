@@ -26,7 +26,8 @@ module Amp
 
       module GitShell
         def git(command)
-          %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command}}
+          #p command
+          %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command} 2> /dev/null}
         end
       end
       include GitShell
@@ -156,7 +157,7 @@ module Amp
       ##
       # Converts a git changeset node into a semi-reliable revision #
       def convert_node_to_rev(node)
-        git("rev-list --reverse HEAD | grep -n #{node} | cut -d: -f1").to_i
+        git("rev-list --reverse HEAD 2>/dev/null | grep -n #{node} 2>/dev/null | cut -d: -f1").to_i
       end
         
       
@@ -165,8 +166,15 @@ module Amp
       def parse!
         return if @parsed
         
+        parse_existing || parse_new
+        
+        @parsed = true
+      end
+
+      def parse_existing
         # the parents
         log_data = git("log -1 #{node}^")
+        return false if log_data.empty?
         
         # DETERMINING PARENTS
         dad   = log_data[/^commit (.+)$/, 1]
@@ -203,7 +211,7 @@ module Amp
         
         # ALTERED FILES
         @altered_files = git("log -1 --pretty=oneline --name-only #{node}").split("\n")[1..-1]
-        
+
         # ALL FILES
         # @all_files is also sorted. Hooray!
         @all_files = git("ls-tree -r #{node}").split("\n").map do |line|
@@ -211,7 +219,18 @@ module Amp
           line[/^\d+ \w+ \w+\s+(.+)$/, 1]
         end
         
-        @parsed = true
+        return true
+      end
+
+      def parse_new
+        @parents = []
+        @date = Time.now
+        @user = ''
+        @description = ''
+        @altered_files = []
+        @all_files = []
+        
+        return true
       end
       
     end

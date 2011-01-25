@@ -26,5 +26,5 @@ require 'rspec/autorun'
 require 'construct'
 
 RSpec.configure do |config|
-  
+  #config.filter_run :focus => true
 end

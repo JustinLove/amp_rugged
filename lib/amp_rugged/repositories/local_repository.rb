@@ -19,7 +19,8 @@ module Amp
         
         class LocalRepository < Amp::Core::Repositories::AbstractLocalRepository
           def git(command)
-            %x{git --git-dir=#{root}/.git --work-tree=#{root} #{command}}
+            #p command
+            %x{git --git-dir=#{root}/.git --work-tree=#{root} #{command} 2> /dev/null}
           end
           
           attr_accessor :root
@@ -72,6 +73,7 @@ module Amp
             string.strip!
             
             git string
+            self[:tip].node
           end
           
           def add_all_files
@@ -179,12 +181,12 @@ module Amp
           def parents
             first = git('log -1 HEAD')
             dad   = first[/^commit (.+)$/, 1]
-            dad   = dad ? dad[0..6] : nil
+            dad   = dad ? NodeId.from_hex(dad) : nil
             mom   = nil
             
             if first =~ /Merge: (.+)\.\.\. (.+)\.\.\.$/ # Merge: 1c002dd... 35cfb2b...
-              dad = $1 # just have them both use the short name, nbd
-              mom = $2
+              dad = NodeId.from_hex($1) # just have them both use the short name, nbd
+              mom = NodeId.from_hex($2)
             end
             
             [dad, mom]

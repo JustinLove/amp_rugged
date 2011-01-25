@@ -18,7 +18,8 @@ module Amp
       module Rugged
         class StagingArea < Amp::Core::Repositories::AbstractStagingArea
           def git(command)
-            %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command}}
+            #p repo.root, command
+            %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command} 2> /dev/null}
           end
           
           attr_accessor :repo
