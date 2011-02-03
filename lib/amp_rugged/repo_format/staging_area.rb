@@ -141,12 +141,9 @@ module Amp
             end
             
             # lame hack, i know
-            case val = inverted[filename]
-            when :modified
-              :normal
-            else
-              val
-            end
+            val = inverted[filename]
+            return :normal if (val.nil? && all_files.include?(filename))
+            return val
           end
           
           # modified, lookup, or clean
@@ -181,19 +178,24 @@ module Amp
             0
           end
           
+          def refresh!
+            @parsed = false
+            parse!
+          end
+
           def parse!
             return if @parsed
             
-            @status = {}
+            @status = Hash.new {|h,k| h[k] = [] }
             data    = git("status").split("\n")
             data.each do |line|
               case line
               when /^#\s+(\w+):\s(.+)$/
-                @status[$1.to_sym] = [$2.strip]
+                @status[$1.to_sym] << $2.strip
               when /^#\s+new file:\s(.+)$/
-                @status[:added] = [$1.strip]
+                @status[:added] << $1.strip
               when /^#\s+([^ ]+)$/
-                @status[:untracked] = [$1.strip]
+                @status[:untracked] << $1.strip
               else
                 @status
               end
