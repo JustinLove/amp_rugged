@@ -180,7 +180,6 @@ module Amp
           
           def refresh!
             @parsed = false
-            parse!
           end
 
           def parse!

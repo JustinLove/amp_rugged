@@ -161,7 +161,7 @@ module Amp
 
           def refresh!
             @parsed = false
-            parse_status!
+            staging_area.refresh!
           end
           
           def parse_status!(opts={})
