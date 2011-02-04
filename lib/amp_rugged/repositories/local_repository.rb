@@ -158,23 +158,34 @@ module Amp
             end
               
           end
+
+          def refresh!
+            @parsed = false
+            parse_status!
+          end
           
           def parse_status!(opts={})
             return if @parsed
             
-            data    = git('status #{opts[:node1]}..#{opts[:node2]}').split("\n")
+            p opts[:node1], opts[:node2]
+            if (opts[:node1] && opts[:node2])
+              data    = git("status #{opts[:node1]}..#{opts[:node2]}").split("\n")
+            else
+              data    = git("status").split("\n")
+            end
+            #puts data
             @status = {}
             data.each do |line| # yeah i know stfu
-              p line
               case line
               when /^#\s+(\w+):\s(.+)$/
-                @status[$1.to_sym] = [$2]
+                @status[$1.to_sym] = [$2.strip]
               when /^#\s+([^ ]+)$/
-                @status[:unknown] = [$1]
+                @status[:unknown] = [$1.strip]
               else
                 @status
               end
             end
+            #p @status
             @parsed = true
           end
           
