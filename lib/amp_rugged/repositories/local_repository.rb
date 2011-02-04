@@ -174,13 +174,13 @@ module Amp
               data    = git("status").split("\n")
             end
             #puts data
-            @status = {}
+            @status = Hash.new {|h,k| h[k] = []}
             data.each do |line| # yeah i know stfu
               case line
               when /^#\s+(\w+):\s(.+)$/
-                @status[$1.to_sym] = [$2.strip]
+                @status[$1.to_sym] << $2.strip
               when /^#\s+([^ ]+)$/
-                @status[:unknown] = [$1.strip]
+                @status[:unknown] << $1.strip
               else
                 @status
               end
