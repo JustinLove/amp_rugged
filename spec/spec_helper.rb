@@ -19,8 +19,8 @@ DEPENDENCIES.each do |x|
   require File.join(File.dirname(__FILE__), '..', '..', x, 'lib', x)
 end
 require 'rubygems'
-require 'amp_rugged'
 require 'bundler/setup'
+require 'amp_rugged'
 require 'rspec'
 require 'rspec/autorun'
 require 'construct'

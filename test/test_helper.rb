@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'bundler/setup'
+
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 DEPENDENCIES = %w(amp_rugged)
@@ -5,7 +8,6 @@ DEPENDENCIES.each do |x|
   require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', x, 'lib', x))
 end
 
-require 'rubygems'
 require 'test/unit'
 require 'minitest/unit'
 require 'tmpdir'

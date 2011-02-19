@@ -25,7 +25,7 @@ class TestRuggedTagObject < AmpTestCase
 
     `git init --bare #{tempdir}`
     repo = Rugged::Repository.new(tempdir)
-    @tagger = Rugged::Person.new('Junio C Hamano', 'junkio@cox.net', 1171411200)
+    @tagger = Rugged::Signature.new('Junio C Hamano', 'junkio@cox.net', Time.at(1171411200))
     @commit = Rugged::Blob.new(repo)
     @commit.content = ''
     @target_sha = @commit.write
