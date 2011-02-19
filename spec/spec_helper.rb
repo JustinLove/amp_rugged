@@ -12,14 +12,13 @@
 #                                                                #
 ##################################################################
 
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-DEPENDENCIES = %w(amp-front amp-core)
-DEPENDENCIES.each do |x|
-  require File.join(File.dirname(__FILE__), '..', '..', x, 'lib', x)
-end
 require 'rubygems'
 require 'bundler/setup'
+
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'amp-front'
+require 'amp-core'
 require 'amp_rugged'
 require 'rspec'
 require 'rspec/autorun'
