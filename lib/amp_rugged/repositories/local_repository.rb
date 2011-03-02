@@ -86,7 +86,7 @@ module Amp
           
           def [](rev)
             case rev
-            when String
+            when NodeId, String
               Amp::Rugged::Changeset.new self, rev
             when nil
               Amp::Rugged::WorkingDirectoryChangeset.new self
