@@ -172,24 +172,11 @@ module Amp
       end
 
       def parse_existing
-        # the parents
-        log_data = git("log -1 #{node}^")
-        return false if log_data.empty?
-        
-        # DETERMINING PARENTS
-        dad   = log_data[/^commit (.+)$/, 1]
-        dad   = dad ? dad[0..6] : nil
-        mom   = nil
-        
-        if log_data =~ /^Merge: (.+)\.\.\. (.+)\.\.\.$/ # Merge: 1c002dd... 35cfb2b...
-          dad = $1 # just have them both use the short name, nbd
-          mom = $2
-        end
-        
-        @parents = [dad, mom].compact.map {|r| Changeset.new repo, r }
-        
+        parse_parents
+
         # the actual changeset
         log_data = git("log -1 #{node}")
+        return false if log_data.empty?
         
         # DETERMINING DATE
         if log_data.match(/Date/)
@@ -220,6 +207,22 @@ module Amp
         end
         
         return true
+      end
+
+      def parse_parents
+        log_data = git("log -1 #{node}^")
+        
+        # DETERMINING PARENTS
+        dad   = log_data[/^commit (.+)$/, 1]
+        dad   = dad ? dad[0..6] : nil
+        mom   = nil
+        
+        if log_data =~ /^Merge: (.+)\.\.\. (.+)\.\.\.$/ # Merge: 1c002dd... 35cfb2b...
+          dad = $1 # just have them both use the short name, nbd
+          mom = $2
+        end
+        
+        @parents = [dad, mom].compact.map {|r| Changeset.new repo, r }
       end
 
       def parse_new
