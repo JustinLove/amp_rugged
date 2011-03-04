@@ -185,19 +185,21 @@ module Amp
 
           def parse!
             return if @parsed
+
+            state = :staging
             
             @status = Hash.new {|h,k| h[k] = [] }
             data    = git("status").split("\n")
             data.each do |line|
               case line
+              when /Changed but not updated/
+                break
               when /^#\s+deleted:\s(.+)$/
                 @status[:removed] << $1.strip
               when /^#\s+(\w+):\s(.+)$/
                 @status[$1.to_sym] << $2.strip
               when /^#\s+new file:\s(.+)$/
                 @status[:added] << $1.strip
-              when /^#\s+([^ ]+)$/
-                @status[:untracked] << $1.strip
               else
                 @status
               end
