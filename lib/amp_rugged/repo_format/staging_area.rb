@@ -18,7 +18,8 @@ module Amp
       module Rugged
         class StagingArea < Amp::Core::Repositories::AbstractStagingArea
           def git(command)
-            #p repo.root, command
+            #p repo.root
+            #p command
             %x{git --git-dir=#{repo.root}/.git --work-tree=#{repo.root} #{command} 2> /dev/null}
           end
           
@@ -189,6 +190,8 @@ module Amp
             data    = git("status").split("\n")
             data.each do |line|
               case line
+              when /^#\s+deleted:\s(.+)$/
+                @status[:removed] << $1.strip
               when /^#\s+(\w+):\s(.+)$/
                 @status[$1.to_sym] << $2.strip
               when /^#\s+new file:\s(.+)$/
@@ -211,7 +214,7 @@ module Amp
           # @return [Array<String>] all files tracked by the repository at this moment in
           #   time, including just-added files (for example) that haven't been committed yet.
           def all_files
-            Amp::Rugged::WorkingDirectoryChangeset.new(@repo).all_files
+            Index.new('index', @repo.git_opener).to_a
           end
         end
       end

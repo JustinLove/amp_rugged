@@ -105,9 +105,13 @@ module Amp
           def [](name)
             @entry_map[name]
           end
+
+          def to_a
+            @entry_map.keys
+          end
           
           def inspect
-            "<Git Index, entries: #{@entry_count}>"
+            "<Git Index, entries: #{size}>"
           end
         end
       end

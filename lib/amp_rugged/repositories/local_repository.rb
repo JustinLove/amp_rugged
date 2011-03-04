@@ -36,7 +36,7 @@ module Amp
             
             @file_opener = Support::RootedOpener.new @root # This will open relative to the repo root
             @file_opener.default = :open_file    # these two are the same, pretty much
-            @git_opener  = Support::RootedOpener.new @root # this will open relative to root/.git
+            @git_opener  = Support::RootedOpener.new File.join(@root, '.git') # this will open relative to root/.git
             @git_opener.default  = :open_git     # just with different defaults
             
             @staging_area = Amp::Core::Repositories::Rugged::StagingArea.new self
