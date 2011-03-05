@@ -318,10 +318,11 @@ module Amp
       
       ##
       # Returns a list of all files that are tracked at this current revision.
+      # Working is a special case - it's the files that are not tracked.
       #
       # @return [Array<String>] the files tracked at the given revision
       def all_files
-        @all_files ||= git("ls-files").split("\n")
+        @all_files ||= git("ls-files --other --exclude-standard").split("\n")
       end
       
       # Is this changeset a working changeset?
