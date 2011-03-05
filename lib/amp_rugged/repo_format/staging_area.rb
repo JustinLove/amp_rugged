@@ -56,7 +56,7 @@ module Amp
           # @param [String, Array<String>] filenames a list of files to remove in the next commit
           # @return [Boolean] true for success, false for failure
           def remove(*filenames)
-            git("rm #{filenames.join ' '}")
+            git("rm -f #{filenames.join ' '}")
             true
           end
 
