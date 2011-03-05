@@ -105,6 +105,7 @@ module Amp
           # @return [Boolean] true for success, false for failure
           def move(from, to)
             git("mv #{from} #{to}")
+            puts git("status")
             true
           end
 
@@ -197,6 +198,9 @@ module Amp
               case line
               when /Changed but not updated/
                 break
+              when /^#\s+renamed:\s(.+)\s->\s(.+)$/
+                @status[:removed] << $1.strip
+                @status[:added] << $2.strip
               when /^#\s+deleted:\s(.+)$/
                 @status[:removed] << $1.strip
               when /^#\s+(\w+):\s(.+)$/
