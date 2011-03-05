@@ -89,7 +89,10 @@ module Amp
           # @param [String] to the destination of the file copy
           # @return [Boolean] true for success, false for failure
           def copy(from, to)
-            git("cp #{from} #{to}")
+            Dir.chdir(repo.root) do
+              system("cp #{from} #{to}")
+            end
+            add(to)
             true
           end
 
