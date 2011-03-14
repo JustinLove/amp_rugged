@@ -128,7 +128,7 @@ module Amp
           # @param [[String]] filenames a list of files to remove from the staging area for committing
           # @return [Boolean] true for success, false for failure
           def exclude(*filenames)
-            git("rm --cached #{filenames.join ' '}")
+            git("reset HEAD #{filenames.join ' '}")
             true
           end
           alias_method :unstage, :exclude
