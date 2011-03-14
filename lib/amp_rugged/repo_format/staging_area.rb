@@ -215,6 +215,13 @@ module Amp
           end
 
           ##
+          # Saves the staging area's state.  Any added files, removed files, "normalized" files
+          # will have that status saved here.
+          def save
+            #noop, shelling out always affects the filesystem
+          end
+
+          ##
           # Returns all files tracked by the repository *for the working directory* - not
           # to be confused with the most recent changeset.
           #
