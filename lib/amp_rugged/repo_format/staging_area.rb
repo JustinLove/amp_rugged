@@ -105,7 +105,6 @@ module Amp
           # @return [Boolean] true for success, false for failure
           def move(from, to)
             git("mv #{from} #{to}")
-            puts git("status")
             true
           end
 
